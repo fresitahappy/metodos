@@ -1,3 +1,6 @@
+streamlit
 torch
+torch.nn 
+torch.nn
 numpy
-matplotlib
+matplotlib.pyplot
