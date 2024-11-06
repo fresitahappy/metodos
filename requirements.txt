@@ -1,4 +1,3 @@
 torch
-torch.nn
 numpy
 matplotlib
