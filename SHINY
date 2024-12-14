@@ -1,0 +1,73 @@
+library(shiny)
+
+# Define UI for gradient descent example
+ui <- fluidPage(
+  
+  # Application title
+  titlePanel("Gradient Descent Example"),
+  
+  # Sidebar layout with inputs
+  sidebarLayout(
+    sidebarPanel(
+      numericInput("learning_rate", 
+                   "Learning Rate:", 
+                   value = 0.1, 
+                   min = 0.01, 
+                   max = 1, 
+                   step = 0.01),
+      numericInput("iterations", 
+                   "Number of Iterations:", 
+                   value = 20, 
+                   min = 1, 
+                   max = 100, 
+                   step = 1),
+      actionButton("run", "Run Gradient Descent")
+    ),
+    
+    # Show the plot
+    mainPanel(
+      plotOutput("gdPlot")
+    )
+  )
+)
+
+# Define server logic
+server <- function(input, output) {
+  
+  observeEvent(input$run, {
+    output$gdPlot <- renderPlot({
+      # Define the function and its gradient
+      f <- function(x) (x - 3)^2 + 2
+      grad_f <- function(x) 2 * (x - 3)
+      
+      # Initialize values
+      learning_rate <- input$learning_rate
+      iterations <- input$iterations
+      x <- numeric(iterations)
+      x[1] <- runif(1, -10, 10) # Random initial point
+      
+      # Perform gradient descent
+      for (i in 2:iterations) {
+        x[i] <- x[i - 1] - learning_rate * grad_f(x[i - 1])
+      }
+      
+      # Generate data for the plot
+      curve_x <- seq(min(x) - 1, max(x) + 1, length.out = 100)
+      curve_y <- f(curve_x)
+      
+      # Plot the function and the descent path
+      plot(curve_x, curve_y, type = "l", lwd = 2, col = "blue",
+           ylab = "f(x)", xlab = "x",
+           main = "Gradient Descent Path")
+      points(x, f(x), col = "red", pch = 19)
+      lines(x, f(x), col = "red", lty = 2)
+      
+      # Annotate the starting and ending points
+      text(x[1], f(x[1]), labels = "Start", pos = 4, col = "darkgreen")
+      text(x[iterations], f(x[iterations]), labels = "End", pos = 4, col = "darkgreen")
+    })
+  })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
